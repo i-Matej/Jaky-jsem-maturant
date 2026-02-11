@@ -100,19 +100,19 @@ button:hover {
 // OTÁZKY (můžeš upravit texty)
 // -----------------------------
 const questions = [
-"1",
-"2",
-"3",
-"4",
-"5",
-"6",
-"7",
-"8",
-"9",
-"10",
-"11",
-"12",
-"13"
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13"
 ];
 
 // -----------------------------
@@ -120,22 +120,19 @@ const questions = [
 // ZDE můžeš nastavit reálné odpovědi
 // škála 1–5 (1 = silně nesouhlasím, 5 = silně souhlasím)
 // -----------------------------
-const parties = [];
-
-for (let i = 1; i <= 27; i++) {
-   const parties = [
+const parties = [
   { name: "Strana 1", answers: [1,1,1,1,1,1,1,1,1,1,1,1,1] },
   { name: "Strana 2", answers: [2,2,2,2,2,2,2,2,2,2,2,2,2] },
   { name: "Strana 3", answers: [3,3,3,3,3,3,3,3,3,3,3,3,3] },
   { name: "Strana 4", answers: [4,4,4,4,4,4,4,4,4,4,4,4,4] },
+  { name: "Strana 5", answers: [5,5,5,5,5,5,5,5,5,5,5,5,5] }
 ];
 
 for (let i = 6; i <= 27; i++) {
   parties.push({
     name: `Strana ${i}`,
-    answers: [Math.floor(Math.random()*5)+1, Math.floor(Math.random()*5)+1, /* ... repeat 13 times ... */]
+    answers: Array.from({length: 13}, () => Math.floor(Math.random()*5)+1)
   });
-}
 }
 
 // -----------------------------
@@ -154,6 +151,7 @@ questions.forEach((q, index) => {
       <option value="2">b</option>
       <option value="3">c</option>
       <option value="4">d</option>
+      <option value="5">e</option>
     </select>
   `;
 
