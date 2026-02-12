@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalkulačka</title>
+<title>Jaký jsem maturant?</title>
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -26,21 +26,54 @@ h1 {
 }
 
 .question {
-  margin-bottom: 25px;
-  padding-bottom: 15px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
   border-bottom: 1px solid #ddd;
 }
 
-label {
+.question-text {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-label {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.option-label:hover {
+  background-color: #f0f0f0;
+  border-color: #0077ff;
+}
+
+.option-label input[type="radio"] {
+  margin-right: 10px;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+.option-label input[type="radio"]:checked + span {
+  color: #0077ff;
   font-weight: bold;
 }
 
-select {
-  width: 100%;
-  padding: 8px;
-  font-size: 14px;
+.option-label.selected {
+  background-color: #e6f2ff;
+  border-color: #0077ff;
 }
 
 button {
@@ -88,91 +121,148 @@ button:hover {
 <body>
 
 <div class="container">
-  <h1>Kalkulačka</h1>
+  <h1>Jaký jsem maturant?</h1>
   <form id="quizForm"></form>
   <button onclick="calculate()">Vyhodnotit shodu</button>
   <div class="results" id="results"></div>
 </div>
 
 <script>
-
-// -----------------------------
-// OTÁZKY
-// -----------------------------
+// Questions with their options
 const questions = [
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "11",
-  "12",
-  "13"
+  {
+    text: "Co udělám, když s průměrem 2,50 dostanu za čtyři?",
+    options: ["budu brečet", "pokusím se to zvrátit (Mohl bych udělat prezentaci?)", "budu si stěžovat, že je na mě zasednutý/á", "hlavně, že jsme zdraví"]
+  },
+  {
+    text: "Co udělám, když náhle zjistím, že máme psát test?",
+    options: ["omluvím si to jako nevolnost", "budu argumentovat, že to není na škole online", "takenu to (pětečka je v kapse)", "uvařím z vody (nejhůře za tři)"]
+  },
+  {
+    text: "Jak strávím své volné odpoledne?",
+    options: ["budu scrollovat do bezvědomí (nebo jinak prokrastinovat)", "podniknu něco s přáteli", "budu sportovat", "budu se učit"]
+  },
+  {
+    text: "Čím nejraději nasytím hlad?",
+    options: ["pivo", "koláč", "salát César", "kebab"]
+  },
+  {
+    text: "Jak strávím volnou hodinu?",
+    options: ["půjdu na procházku", "prospím se", "budu se připravovat na ostatní předměty", "zahrají si něco nebo si zascrolluju"]
+  },
+  {
+    text: "Čím zaženu nudu, když se můj mobil z neznámých důvodů nachází v ředitelně?",
+    options: ["spánkem", "kreslením", "filosofickými debatami se sousedem", "tupým koukáním z okna"]
+  },
+  {
+    text: "Pro koho/co jsem během týdne nejochotnější obětovat spánek?",
+    options: ["pro přátele", "pro učení se na písemku", "pro nic, spánek je pro mě na prvním místě", "pro dobrý film nebo seriál"]
+  },
+  {
+    text: "Jaký z těchto kuriózních sportů bych nejraději vyzkoušel?",
+    options: ["kriket na koni", "extrémní žehlení", "podvodní hokej", "mudlovský famfrpál"]
+  },
+  {
+    text: "Kdybych nechodil/a do školy, jak by vypadal můj život?",
+    options: ["celý den bych se šoural/a doma v pyžamu", "život v lese", "počítal/a bych tučňáky na Antarktidě a jiná dobrodružství", "nekonečná párty"]
+  },
+  {
+    text: "Kolik je podle mě potřeba sešitů na absolvování vyššího stupně gymnázia?",
+    options: ["0", "1", "2-5 (přiměřeně)", "1 na každý předmět"]
+  },
+  {
+    text: "Jak dlouho je pro mě ideální zůstat na maturáku?",
+    options: ["po půlnočku se zdejchu, pak už se nic neděje", "zůstanu do konce maturáku, ale afterparty není nic pro mě", "budu pařit i na after a zůstanu vzhůru celou noc", "nevím, nebudu si pamatovat, kde jsem tu noc byl"]
+  },
+  {
+    text: "Co je podle mne ideální část dne na učení se (nebo jakoukoliv mozkovou aktivitu)?",
+    options: ["ráno a dopoledne", "odpoledne", "pozdní odpoledne a večer", "noc"]
+  },
+  {
+    text: "Co je pro mě naprosto nepředstavitelné?",
+    options: ["několik dní v kuse se učit", "strávit několik dní pouze venku", "držet pár dní půst", "být opilý nebo jinak pod vlivem pár dní za sebou"]
+  }
 ];
 
-// -----------------------------
-// 27 STRAN (ukázková data)
-// škála 1–5 (1 = silně nesouhlasím, 5 = silně souhlasím)
-// -----------------------------
+// 27 parties - FILL IN THE ANSWERS HERE (use 0, 1, 2, 3 for options a, b, c, d)
 const parties = [
-  { name: "Strana 1", answers: [1,1,1,1,1,1,1,1,1,1,1,1,1] },
-  { name: "Strana 2", answers: [2,2,2,2,2,2,2,2,2,2,2,2,2] },
-  { name: "Strana 3", answers: [3,3,3,3,3,3,3,3,3,3,3,3,3] },
-  { name: "Strana 4", answers: [4,4,4,4,4,4,4,4,4,4,4,4,4] },
-  { name: "Strana 5", answers: [5,5,5,5,5,5,5,5,5,5,5,5,5] }
+  { name: "Ondřej Karlík", answers: [3, 0, 2, 0, 1, 2, 1, 2, 1, 1, 2, 3, 2] },
+  { name: "Sam Bendík", answers: [3, 2, 2, 3, 3, 0, 0, 3, 3, 2, 2, 3, 0] },
+  { name: "Domča Badová", answers: [3, 3, 0, 3, 1, 3, 2, 1, 2, 3, 0, 2, 0] },
+  { name: "Kája Janků", answers: [3, 0, 2, 2, 2, 0, 2, 1, 3, 3, 2, 2, 2] },
+  { name: "Vojtěch Karlík", answers: [2, 0, 0, 3, 1, 0, 3, 0, 1, 0, 0, 3, 3] },
+  { name: "Martina Hnízdová", answers: [1, 3, 1, 3, 3, 1, 0, 1, 1, 3, 3, 2, 3] },
+  { name: "Naty Fejtková", answers: [0, 3, 0, 1, 3, 3, 1, 1, 1, 3, 1, 3, 2] },
+  { name: "Petr Veselý", answers: [3, 2, 2, 3, 3, 0, 0, 3, 2, 0, 2, 2, 0] },
+  { name: "Tonda Žoha", answers: [3, 3, 2, 3, 2, 2, 0, 3, 3, 0, 2, 3, 2] },
+  { name: "Albert Plevný", answers: [3, 3, 2, 3, 2, 3, 2, 2, 1, 2, 1, 0, 3] },
+  { name: "Kamča Džupinová", answers: [1, 3, 3, 1, 2, 3, 1, 3, 1, 3, 1, 0, 3] },
+  { name: "Simča Kerekaničová", answers: [3, 2, 0, 3, 1, 3, 2, 1, 1, 1, 2, 3, 0] },
+  { name: "Dáša Žibrická", answers: [2, 2, 0, 3, 1, 3, 0, 2, 0, 2, 2, 3, 2] },
+  { name: "Matěj Brabec", answers: [1, 3, 1, 0, 2, 1, 0, 2, 1, 2, 1, 0, 2] },
+  { name: "Anička Marková", answers: [2, 0, 0, 0, 3, 2, 0, 0, 2, 1, 2, 3, 0] },
+  { name: "Honza Žibrický", answers: [1, 3, 2, 1, 3, 2, 0, 3, 2, 2, 1, 2, 0] },
+  { name: "Terka Zvěřinová", answers: [0, 3, 1, 3, 2, 3, 0, 1, 1, 3, 1, 2, 3] },
+  { name: "Šimon Svarovský", answers: [3, 3, 1, 0, 2, 2, 0, 0, 2, 2, 2, 2, 2] },
+  { name: "Dan Svoboda", answers: [3, 2, 2, 3, 0, 2, 0, 1, 1, 2, 2, 0, 3] },
+  { name: "Štěpán Sauer", answers: [3, 2, 2, 0, 0, 3, 2, 0, 2, 2, 3, 0, 2] },
+  { name: "Kačka Hostková", answers: [1, 3, 0, 2, 2, 2, 1, 0, 2, 3, 2, 3, 2] },
+  { name: "Tomáš Thoss", answers: [3, 2, 0, 3, 3, 3, 3, 3, 0, 2, 3, 3, 0] },
+  { name: "Linda Bucharová", answers: [3, 3, 3, 2, 2, 2, 2, 2, 2, 3, 2, 0, 2] },
+  { name: "Láďa Turták", answers: [3, 3, 0, 3, 1, 0, 2, 1, 3, 1, 3, 2, 0] },
+  { name: "Naty Kovandová", answers: [3, 3, 2, 3, 2, 3, 1, 3, 3, 3, 2, 3, 0] },
+  { name: "Anežka Jíchová", answers: [2, 3, 1, 3, 1, 0, 0, 1, 0, 2, 3, 2, 0] },
+  { name: "Kája Veselá", answers: [1, 3, 2, 2, 3, 2, 2, 3, 2, 3, 1, 0, 3] }
 ];
 
-for (let i = 6; i <= 27; i++) {
-  parties.push({
-    name: `Strana ${i}`,
-    answers: Array.from({length: 13}, () => Math.floor(Math.random()*5)+1)
-  });
-}
-
-// -----------------------------
-// GENEROVÁNÍ FORMULÁŘE
-// -----------------------------
 const form = document.getElementById("quizForm");
 
-questions.forEach((q, index) => {
+questions.forEach(function(q, index) {
   const div = document.createElement("div");
   div.classList.add("question");
 
-  div.innerHTML = `
-    <label>${index+1}. ${q}</label>
-    <select id="q${index}">
-      <option value="1">a</option>
-      <option value="2">b</option>
-      <option value="3">c</option>
-      <option value="4">d</option>
-      <option value="5">e</option>
-    </select>
-  `;
+  let optionsHTML = '<span class="question-text">' + (index+1) + '. ' + q.text + '</span><div class="options">';
+  
+  q.options.forEach(function(option, optIndex) {
+    optionsHTML += '<label class="option-label" id="label' + index + '-' + optIndex + '"><input type="radio" name="q' + index + '" value="' + optIndex + '" onchange="updateUI(this)"><span>' + option + '</span></label>';
+  });
+
+  optionsHTML += '</div>';
+  div.innerHTML = optionsHTML;
 
   form.appendChild(div);
 });
 
-// -----------------------------
-// VÝPOČET SHODY
-// -----------------------------
+function updateUI(radio) {
+  const labels = document.querySelectorAll('label[class*="option-label"]');
+  labels.forEach(function(label) {
+    label.classList.remove('selected');
+  });
+  
+  const parentLabel = radio.closest('label');
+  if (parentLabel) {
+    parentLabel.classList.add('selected');
+  }
+}
+
 function calculate() {
-
   const userAnswers = [];
+  const radioButtons = document.querySelectorAll('input[type="radio"]:checked');
 
-  for (let i = 0; i < questions.length; i++) {
-    userAnswers.push(parseInt(document.getElementById("q"+i).value));
+  if (radioButtons.length < questions.length) {
+    alert('Prosím vyplňte všechny otázky!');
+    return;
   }
 
-  const results = parties.map(party => {
+  radioButtons.forEach(function(radio) {
+    userAnswers.push(parseInt(radio.value));
+  });
+
+  const results = parties.map(function(party) {
     let matches = 0;
 
     for (let i = 0; i < questions.length; i++) {
-      if (userAnswers[i] === party.answers[i]) {
+      if (party.answers[i] !== null && userAnswers[i] === party.answers[i]) {
         matches++;
       }
     }
@@ -183,30 +273,20 @@ function calculate() {
     };
   });
 
-  results.sort((a,b) => b.percentage - a.percentage);
+  results.sort(function(a,b) { return b.percentage - a.percentage; });
 
   displayResults(results);
 }
 
-// -----------------------------
-// ZOBRAZENÍ VÝSLEDKŮ
-// -----------------------------
 function displayResults(results) {
   const resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = "<h2>Vaše shoda:</h2>";
 
-  results.forEach(r => {
+  results.forEach(function(r) {
     const div = document.createElement("div");
     div.classList.add("result-item");
 
-    div.innerHTML = `
-      <strong>${r.name}</strong>
-      <div class="progress-bar">
-        <div class="progress-fill" style="width:${r.percentage}%">
-          ${r.percentage}%
-        </div>
-      </div>
-    `;
+    div.innerHTML = '<strong>' + r.name + '</strong><div class="progress-bar"><div class="progress-fill" style="width:' + r.percentage + '%">' + r.percentage + '%</div></div>';
 
     resultsDiv.appendChild(div);
   });
